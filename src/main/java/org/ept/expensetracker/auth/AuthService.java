@@ -21,7 +21,7 @@ public class AuthService {
     }
 
     public AuthResponse signup(AuthRequest request) {
-        if (userService.getUserByEmail(request.getEmail()).isPresent()) {
+        if (userService.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("User already exists");
         }
 

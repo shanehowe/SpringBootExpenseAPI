@@ -23,7 +23,7 @@ public class ExpenseController {
 
     @GetMapping("/{id}")
     private ResponseEntity<Expense> findById(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        Optional<Expense> expense = Optional.ofNullable(expenseService.findById(id, user.getId()));
+        Optional<Expense> expense = Optional.ofNullable(expenseService.findByIdAndUserId(id, user.getId()));
         return expense.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

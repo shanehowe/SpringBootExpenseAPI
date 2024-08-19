@@ -24,7 +24,7 @@ public class ExpenseService {
         );
     }
 
-    public Expense findById(Long id, Long userId) {
+    public Expense findByIdAndUserId(Long id, Long userId) {
         return expenseRepository.findByIdAndUserId(id, userId).orElse(null);
     }
 
