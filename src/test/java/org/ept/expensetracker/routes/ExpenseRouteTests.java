@@ -154,4 +154,23 @@ class ExpenseRouteTests {
         int length = documentContext.read("$.length()");
         assertThat(length).isEqualTo(PAGE_SIZE);
     }
+
+    @Test
+    void shouldUpdateAnExpense() {
+        ExpenseDto expenseDto = new ExpenseDto(123.45, "FOOD");
+        ResponseEntity<String> response = restTemplate
+                .postForEntity("/expenses", expenseDto, String.class);
+
+        DocumentContext documentContext = JsonPath.parse(response.getBody());
+        Number id = documentContext.read("$.id");
+
+        ExpenseDto updatedExpenseDto = new ExpenseDto(543.21, "FOOD");
+        restTemplate.put("/expenses/" + id, updatedExpenseDto);
+
+        ResponseEntity<String> updatedResponse = restTemplate.getForEntity("/expenses/" + id, String.class);
+        DocumentContext updatedDocumentContext = JsonPath.parse(updatedResponse.getBody());
+        Number amount = updatedDocumentContext.read("$.amount");
+
+        assertThat(amount).isEqualTo(543.21);
+    }
 }
