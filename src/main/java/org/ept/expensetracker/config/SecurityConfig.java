@@ -1,5 +1,6 @@
 package org.ept.expensetracker.config;
 
+import org.ept.expensetracker.user.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,9 +25,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/expenses/**")
-                                .authenticated()
+                                .hasRole(Role.USER.name())
                                 .requestMatchers("/auth/**")
                                 .permitAll()
+                                .anyRequest()
+                                .authenticated()
 
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
