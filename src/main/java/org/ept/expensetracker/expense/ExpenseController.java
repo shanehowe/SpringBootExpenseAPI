@@ -56,4 +56,14 @@ public class ExpenseController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    private ResponseEntity<?> deleteExpense(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        try {
+            expenseService.deleteExpense(id, user.getId());
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

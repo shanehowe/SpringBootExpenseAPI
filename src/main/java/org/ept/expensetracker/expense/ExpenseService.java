@@ -45,4 +45,10 @@ public class ExpenseService {
         expense.setCategory(expenseDto.getCategory());
         expenseRepository.save(expense);
     }
+
+    public void deleteExpense(Long id, Long userId) {
+        Expense expense = expenseRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Expense not found"));
+        expenseRepository.delete(expense);
+    }
 }

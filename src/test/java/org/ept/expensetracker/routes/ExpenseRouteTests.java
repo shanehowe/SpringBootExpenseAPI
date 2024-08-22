@@ -4,6 +4,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.ept.expensetracker.auth.AuthRequest;
 import org.ept.expensetracker.expense.ExpenseDto;
+import org.ept.expensetracker.user.Role;
 import org.ept.expensetracker.user.User;
 import org.ept.expensetracker.user.UserService;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -64,6 +66,7 @@ class ExpenseRouteTests {
                 .id(1L)
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .role(Role.USER)
                 .build();
         userService.saveUser(newUser);
     }
@@ -172,5 +175,27 @@ class ExpenseRouteTests {
         Number amount = updatedDocumentContext.read("$.amount");
 
         assertThat(amount).isEqualTo(543.21);
+    }
+
+    @Test
+    void shouldDeleteExpense() {
+        ExpenseDto expenseDto = new ExpenseDto(123.45, "FOOD");
+        ResponseEntity<String> response = restTemplate
+                .postForEntity("/expenses", expenseDto, String.class);
+
+        DocumentContext documentContext = JsonPath.parse(response.getBody());
+        Number id = documentContext.read("$.id");
+
+        restTemplate.delete("/expenses/" + id);
+
+        ResponseEntity<String> deletedResponse = restTemplate.getForEntity("/expenses/" + id, String.class);
+        assertThat(deletedResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotDeleteExpenseWhenItDoesntExist() {
+        ResponseEntity<Void> response = restTemplate
+                .exchange("/expenses/123", HttpMethod.DELETE, null, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }
