@@ -48,7 +48,10 @@ public class ExpenseService {
 
     public void deleteExpense(Long id, Long userId) {
         Expense expense = expenseRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Expense not found"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Expense with id %d not found", id)
+                    )
+                );
         expenseRepository.delete(expense);
     }
 }
